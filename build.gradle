@@ -39,6 +39,7 @@ allprojects {
         mavenLocal()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+        maven { url 'https://maven.google.com' }
     }
 
     group = GROUPID
@@ -60,6 +61,7 @@ project(":android-fcm") {
     dependencies {
         compile project(':core')
         compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+        compile 'com.google.firebase:firebase-messaging:17.3.4'
 
     }
 }
