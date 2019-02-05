@@ -12,9 +12,10 @@ public interface IPushMessageListener {
 
 	/**
 	 * Called if a push message with a payload arrived. Note that this might be called if your game is in background
-	 * and not on the main thread, so make sure to use {@code Gdx.app.postRunnable()} if needed.
+	 * and not on the main thread, so make sure to use {@code Gdx.app.postRunnable()} if needed. It might also get
+	 * called right after initializing the app if the user started the app via a notification.
 	 *
-	 * @param payload
+	 * @param payload payload, might be null in some cases
 	 */
 	void onPushMessageArrived(String payload);
 }

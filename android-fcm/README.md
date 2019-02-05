@@ -42,5 +42,8 @@ AndroidLauncher:
 
 ### Good to know
 
-* You can change the icon and color for notifications by changing your AndroidManifest.xml
+* You can change the icon, text color and Android O channel for notifications by 
+[changing your AndroidManifest.xml](https://firebase.google.com/docs/cloud-messaging/android/client)
 * Specifiy the payload for your game in the data key named "payload"
+* Note that your listener's `onPushMessageArrived()` method won't get called always if you send a notification message.
+See [Firebase doc](https://firebase.google.com/docs/cloud-messaging/android/receive)

@@ -48,7 +48,7 @@ public class FcmMessageProvider implements IPushMessageProvider, LifecycleListen
 			LocalBroadcastManager.getInstance(activity).registerReceiver((mMessageReceiver),
 					new IntentFilter(FcmHandler.KEY_MESSAGE_INTENT));
 
-			// TODO Intent aus Notification auslesen
+			checkIntent();
 
 			Gdx.app.log(PROVIDER_ID, "Retrieving FCM token...");
 			FirebaseInstanceId.getInstance().getInstanceId()
@@ -73,6 +73,17 @@ public class FcmMessageProvider implements IPushMessageProvider, LifecycleListen
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * if game was started with a tap on a notification, the extra data of this notification was added to the Intent
+	 * extras. Override this if you don't want it to get delivered to the listener
+	 */
+	protected void checkIntent() {
+		if (listener != null && activity.getIntent().getExtras() != null &&
+				activity.getIntent().getExtras().containsKey(FcmHandler.KEY_RM_PAYLOAD)) {
+			listener.onPushMessageArrived(activity.getIntent().getExtras().getString(FcmHandler.KEY_RM_PAYLOAD));
+		}
 	}
 
 	@Override
