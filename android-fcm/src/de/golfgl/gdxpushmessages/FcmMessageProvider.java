@@ -34,7 +34,7 @@ public class FcmMessageProvider implements IPushMessageProvider, LifecycleListen
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				if (listener != null) {
-					String payload = intent.getExtras().getString(FcmHandler.KEY_MESSAGE_INTENT_PAYLOAD);
+					String payload = intent.getExtras().getString(FcmMessageHandler.KEY_MESSAGE_INTENT_PAYLOAD);
 					listener.onPushMessageArrived(payload);
 				}
 			}
@@ -46,7 +46,7 @@ public class FcmMessageProvider implements IPushMessageProvider, LifecycleListen
 		if (this.listener == null && registrationToken == null) {
 			this.listener = listener;
 			LocalBroadcastManager.getInstance(activity).registerReceiver((mMessageReceiver),
-					new IntentFilter(FcmHandler.KEY_MESSAGE_INTENT));
+					new IntentFilter(FcmMessageHandler.KEY_MESSAGE_INTENT));
 
 			checkIntent();
 
@@ -81,8 +81,8 @@ public class FcmMessageProvider implements IPushMessageProvider, LifecycleListen
 	 */
 	protected void checkIntent() {
 		if (listener != null && activity.getIntent().getExtras() != null &&
-				activity.getIntent().getExtras().containsKey(FcmHandler.KEY_RM_PAYLOAD)) {
-			listener.onPushMessageArrived(activity.getIntent().getExtras().getString(FcmHandler.KEY_RM_PAYLOAD));
+				activity.getIntent().getExtras().containsKey(FcmMessageHandler.KEY_RM_PAYLOAD)) {
+			listener.onPushMessageArrived(activity.getIntent().getExtras().getString(FcmMessageHandler.KEY_RM_PAYLOAD));
 		}
 	}
 

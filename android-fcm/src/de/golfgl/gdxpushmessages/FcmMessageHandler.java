@@ -11,7 +11,7 @@ import com.google.firebase.messaging.RemoteMessage;
  * context, your app might not be running at all when this gets called. Also note that if you use Firebase notification,
  * they are not displayed when your game is running but also only sended to your game if you specify data.
  */
-public class FcmHandler extends FirebaseMessagingService {
+public class FcmMessageHandler extends FirebaseMessagingService {
 	public static final String KEY_MESSAGE_INTENT = "FCM_BROADCAST";
 	public static final String KEY_MESSAGE_INTENT_PAYLOAD = "FCM_DATA";
 	protected static final String KEY_RM_PAYLOAD = "payload";
@@ -26,12 +26,18 @@ public class FcmHandler extends FirebaseMessagingService {
 
 	@Override
 	public void onMessageReceived(RemoteMessage remoteMessage) {
-		super.onMessageReceived(remoteMessage);
-
 		String payload = null;
 		if (remoteMessage.getData().containsKey(KEY_RM_PAYLOAD))
 			payload = remoteMessage.getData().get(KEY_RM_PAYLOAD);
 
+		callPushMessageListenerOnMessageArrived(payload);
+	}
+
+	/**
+	 * calls {@link IPushMessageListener#onPushMessageArrived(String)} when your game is running
+	 * @param payload a payload to give to the listener
+	 */
+	protected void callPushMessageListenerOnMessageArrived(String payload) {
 		Intent intent = new Intent(KEY_MESSAGE_INTENT);
 		intent.putExtra(KEY_MESSAGE_INTENT_PAYLOAD, payload);
 		broadcaster.sendBroadcast(intent);
