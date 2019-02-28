@@ -25,7 +25,7 @@ This project is published to the Sonatype Maven repository. You can integrate th
 Define the version of this API right after the gdxVersion:
 
     gdxVersion = '1.9.8' //or a later gdx version you use
-    pushMsgsVersion = '0.0.1-SNAPSHOT'
+    pushMsgsVersion = '0.0.1'
 
 Then add the needed dependencies to each subproject:
 
@@ -61,10 +61,10 @@ The listener is a class implementing `IPushMessageListener` provided by you if y
 messages while your game is running. Handling messages when your game is not running depends of the used platform and
  service, see the subprojects for documentation. 
 
-## Updates & News
-Follow me to receive release updates about this
+### News & Community
 
-https://twitter.com/MrStahlfelge
+You can get help on the [libgdx discord](https://discord.gg/6pgDK9F).
+
 
 # License
 
