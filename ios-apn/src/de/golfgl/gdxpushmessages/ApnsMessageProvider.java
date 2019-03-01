@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import org.robovm.apple.dispatch.DispatchQueue;
 import org.robovm.apple.foundation.NSError;
 import org.robovm.apple.uikit.UIApplication;
+import org.robovm.apple.uikit.UIRemoteNotification;
 import org.robovm.apple.usernotifications.UNAuthorizationOptions;
 import org.robovm.apple.usernotifications.UNAuthorizationStatus;
 import org.robovm.apple.usernotifications.UNNotificationSettings;
@@ -18,6 +19,7 @@ import org.robovm.objc.block.VoidBlock2;
  * */
 public class ApnsMessageProvider implements IPushMessageProvider {
     protected static final String PROVIDER_ID = "APNS";
+    protected static final String KEY_RM_PAYLOAD = "payload";
     private static String pushToken;
     private static boolean isRequestingToken;
     private static IPushMessageListener listener;
@@ -117,6 +119,15 @@ public class ApnsMessageProvider implements IPushMessageProvider {
                 listener.onRegistrationTokenRetrieved(pushToken);
         } else
             Gdx.app.error(PROVIDER_ID, "Failure retrieving push token");
+    }
+
+    static void pushMessageArrived(UIRemoteNotification remoteNotification) {
+        if (listener == null) {
+            Gdx.app.log(PROVIDER_ID, "Message arrived, no listener.");
+            return;
+        }
+
+        listener.onPushMessageArrived(remoteNotification.getString(KEY_RM_PAYLOAD));
     }
 
     public static String byteToHex(byte[] num) {

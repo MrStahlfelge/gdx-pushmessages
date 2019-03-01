@@ -5,6 +5,10 @@ import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import org.robovm.apple.foundation.NSData;
 import org.robovm.apple.foundation.NSError;
 import org.robovm.apple.uikit.UIApplication;
+import org.robovm.apple.uikit.UIApplicationLaunchOptions;
+import org.robovm.apple.uikit.UIBackgroundFetchResult;
+import org.robovm.apple.uikit.UIRemoteNotification;
+import org.robovm.objc.block.VoidBlock1;
 
 /**
  * Use this as a superclass of your IOSLauncher (or ensure that the defined methods here are
@@ -24,4 +28,20 @@ public abstract class ApnsAppDelegate extends IOSApplication.Delegate {
     public void didRegisterForRemoteNotifications(UIApplication application, NSData deviceToken) {
         ApnsMessageProvider.didRegisterForRemoteNotifications(true, deviceToken.getBytes());
     }
+    
+    @Override
+    public void didReceiveRemoteNotification(UIApplication application, UIRemoteNotification userInfo, VoidBlock1<UIBackgroundFetchResult> completionHandler) {
+        super.didReceiveRemoteNotification(application, userInfo, completionHandler);
+        ApnsMessageProvider.pushMessageArrived(userInfo);
+    }
+
+    @Override
+    public boolean didFinishLaunching(UIApplication application, UIApplicationLaunchOptions launchOptions) {
+        boolean retVal = super.didFinishLaunching(application, launchOptions);
+        UIRemoteNotification remoteNotification = launchOptions.getRemoteNotification();
+        if (remoteNotification != null)
+            ApnsMessageProvider.pushMessageArrived(remoteNotification);
+        return retVal;
+    }
+
 }
