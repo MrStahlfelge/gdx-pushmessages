@@ -28,7 +28,7 @@ public abstract class ApnsAppDelegate extends IOSApplication.Delegate {
     public void didRegisterForRemoteNotifications(UIApplication application, NSData deviceToken) {
         ApnsMessageProvider.didRegisterForRemoteNotifications(true, deviceToken.getBytes());
     }
-    
+
     @Override
     public void didReceiveRemoteNotification(UIApplication application, UIRemoteNotification userInfo, VoidBlock1<UIBackgroundFetchResult> completionHandler) {
         super.didReceiveRemoteNotification(application, userInfo, completionHandler);
@@ -38,9 +38,11 @@ public abstract class ApnsAppDelegate extends IOSApplication.Delegate {
     @Override
     public boolean didFinishLaunching(UIApplication application, UIApplicationLaunchOptions launchOptions) {
         boolean retVal = super.didFinishLaunching(application, launchOptions);
-        UIRemoteNotification remoteNotification = launchOptions.getRemoteNotification();
-        if (remoteNotification != null)
-            ApnsMessageProvider.pushMessageArrived(remoteNotification);
+        if (launchOptions != null) {
+            UIRemoteNotification remoteNotification = launchOptions.getRemoteNotification();
+            if (remoteNotification != null)
+                ApnsMessageProvider.pushMessageArrived(remoteNotification);
+        }
         return retVal;
     }
 
