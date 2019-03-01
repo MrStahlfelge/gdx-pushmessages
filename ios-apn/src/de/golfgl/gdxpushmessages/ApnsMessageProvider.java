@@ -13,7 +13,7 @@ import org.robovm.objc.block.VoidBlock1;
 import org.robovm.objc.block.VoidBlock2;
 
 /**
- * IPushMessageProvider for APNS on iOS (RoboVM). Don't forget to use ApnsAppDelegate as your
+ * IPushMessageProvider for APNS on iOS (RoboVM). Don't forget to use {@link ApnsAppDelegate} as your
  * IOSLauncher's superclass
  * */
 public class ApnsMessageProvider implements IPushMessageProvider {
@@ -21,8 +21,18 @@ public class ApnsMessageProvider implements IPushMessageProvider {
     private static String pushToken;
     private static boolean isRequestingToken;
     private static IPushMessageListener listener;
+    private final boolean requestNotificationPermission;
 
-    @Override
+	/**
+	 * @param requestNotificationPermission if set to true, user permission for showing notifications is requested
+	 *                                         before retrieving a push token. Use this if you want to show
+	 *                                         notification messages to the user
+	 */
+	public ApnsMessageProvider(boolean requestNotificationPermission) {
+		this.requestNotificationPermission = requestNotificationPermission;
+	}
+
+	@Override
     public boolean initService(IPushMessageListener listener) {
         if (pushToken != null || isRequestingToken || this.listener != null)
             return false;
@@ -30,43 +40,60 @@ public class ApnsMessageProvider implements IPushMessageProvider {
         this.listener = listener;
 
         isRequestingToken = true;
+        if (requestNotificationPermission)
+        	requestNotificationPermission();
+        else
+			requestPushToken();
+
+		return true;
+    }
+
+	/**
+	 * requests a push token. Callback from iOS comes to AppDelegate methods, which need to forward back to this class.
+	 */
+	protected void requestPushToken() {
+		Gdx.app.debug(PROVIDER_ID, "Requesting push token...");
+		UIApplication.getSharedApplication().registerForRemoteNotifications();
+	}
+
+	/**
+     * Requests permission for showing notifications with badges, sound and alert.
+     */
+    protected void requestNotificationPermission() {
         UNUserNotificationCenter.currentNotificationCenter().requestAuthorization(UNAuthorizationOptions.with(UNAuthorizationOptions.Badge,
                 UNAuthorizationOptions.Alert, UNAuthorizationOptions.Sound), new VoidBlock2<Boolean, NSError>() {
             @Override
             public void invoke(Boolean granted, NSError nsError) {
                 if (granted)
-                    getSettingsAndRegister();
+					getNotificationSettingsAndRequestPushtoken();
                 else {
-                    isRequestingToken = false;
-                    Gdx.app.log(PROVIDER_ID, "User declined authorization");
-                }
-            }
-        });
-
-        return true;
-    }
-
-    protected void getSettingsAndRegister() {
-        UNUserNotificationCenter.currentNotificationCenter().getNotificationSettingsWithCompletionHandler(new VoidBlock1<UNNotificationSettings>() {
-            @Override
-            public void invoke(UNNotificationSettings unNotificationSettings) {
-                if (unNotificationSettings.getAuthorizationStatus().equals(UNAuthorizationStatus.Authorized)) {
-                    DispatchQueue.getMainQueue().async(new Runnable() {
-                        @Override
-                        public void run() {
-                            Gdx.app.debug(PROVIDER_ID, "Requesting push token.");
-                            UIApplication.getSharedApplication().registerForRemoteNotifications();
-                        }
-                    });
-                } else {
-                    Gdx.app.log(PROVIDER_ID, "User declined authorization");
-                    isRequestingToken = false;
+					isRequestingToken = false;
+                    Gdx.app.log(PROVIDER_ID, "User declined authorization for notifications.");
                 }
             }
         });
     }
 
-    @Override
+	protected void getNotificationSettingsAndRequestPushtoken() {
+		UNUserNotificationCenter.currentNotificationCenter().getNotificationSettingsWithCompletionHandler(new VoidBlock1<UNNotificationSettings>() {
+			@Override
+			public void invoke(UNNotificationSettings unNotificationSettings) {
+				if (unNotificationSettings.getAuthorizationStatus().equals(UNAuthorizationStatus.Authorized)) {
+					DispatchQueue.getMainQueue().async(new Runnable() {
+						@Override
+						public void run() {
+							requestPushToken();
+						}
+					});
+				} else {
+					Gdx.app.log(PROVIDER_ID, "User declined authorization");
+					isRequestingToken = false;
+				}
+			}
+		});
+	}
+
+	@Override
     public String getRegistrationToken() {
         return pushToken;
     }
