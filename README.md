@@ -4,9 +4,8 @@ Use Push Message services in your libGDX game.
 
 ## Supported game services
 
-* [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/) (Android)
-
-More to come....
+* [Firebase Cloud Messaging](https://github.com/MrStahlfelge/gdx-pushmessages/tree/master/android-fcm) (Android)
+* [Apple Push Notification Service](https://github.com/MrStahlfelge/gdx-pushmessages/tree/master/ios-apn) (iOS)
 
 ## Basic concept
 
