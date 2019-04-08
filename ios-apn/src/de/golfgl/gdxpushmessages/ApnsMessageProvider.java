@@ -3,6 +3,7 @@ package de.golfgl.gdxpushmessages;
 import com.badlogic.gdx.Gdx;
 
 import org.robovm.apple.dispatch.DispatchQueue;
+import org.robovm.apple.foundation.Foundation;
 import org.robovm.apple.foundation.NSError;
 import org.robovm.apple.uikit.UIApplication;
 import org.robovm.apple.uikit.UIRemoteNotification;
@@ -45,7 +46,7 @@ public class ApnsMessageProvider implements IPushMessageProvider {
         if (requestNotificationPermission)
         	requestNotificationPermission();
         else
-			requestPushToken();
+			requestPushtoken();
 
 		return true;
     }
@@ -53,7 +54,7 @@ public class ApnsMessageProvider implements IPushMessageProvider {
 	/**
 	 * requests a push token. Callback from iOS comes to AppDelegate methods, which need to forward back to this class.
 	 */
-	protected void requestPushToken() {
+	protected void requestPushtoken() {
 		Gdx.app.debug(PROVIDER_ID, "Requesting push token...");
 		UIApplication.getSharedApplication().registerForRemoteNotifications();
 	}
@@ -77,20 +78,29 @@ public class ApnsMessageProvider implements IPushMessageProvider {
     }
 
 	protected void getNotificationSettingsAndRequestPushtoken() {
-		UNUserNotificationCenter.currentNotificationCenter().getNotificationSettingsWithCompletionHandler(new VoidBlock1<UNNotificationSettings>() {
-			@Override
-			public void invoke(UNNotificationSettings unNotificationSettings) {
-				if (unNotificationSettings.getAuthorizationStatus().equals(UNAuthorizationStatus.Authorized)) {
-					DispatchQueue.getMainQueue().async(new Runnable() {
-						@Override
-						public void run() {
-							requestPushToken();
-						}
-					});
-				} else {
-					Gdx.app.log(PROVIDER_ID, "User declined authorization");
-					isRequestingToken = false;
+    	if (Foundation.getMajorSystemVersion() >= 10)
+			UNUserNotificationCenter.currentNotificationCenter().getNotificationSettings(new VoidBlock1<UNNotificationSettings>() {
+				@Override
+				public void invoke(UNNotificationSettings unNotificationSettings) {
+					if (unNotificationSettings.getAuthorizationStatus().equals(UNAuthorizationStatus.Authorized)) {
+						requestPushtokenOnMainThread();
+					} else {
+						Gdx.app.log(PROVIDER_ID, "User declined authorization");
+						isRequestingToken = false;
+					}
 				}
+			});
+    	else {
+    		// TODO check for notification authorization on iOS <= 9
+    		requestPushtokenOnMainThread();
+		}
+	}
+
+	protected void requestPushtokenOnMainThread() {
+		DispatchQueue.getMainQueue().async(new Runnable() {
+			@Override
+			public void run() {
+				requestPushtoken();
 			}
 		});
 	}
