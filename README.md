@@ -24,7 +24,7 @@ This project is published to the Sonatype Maven repository. You can integrate th
 Define the version of this API right after the gdxVersion:
 
     gdxVersion = '1.9.8' //or a later gdx version you use
-    pushMsgsVersion = '0.0.1'
+    pushMsgsVersion = '1.0.0'
 
 Then add the needed dependencies to each subproject:
 
