@@ -30,9 +30,12 @@ Add the dependency to the Android project:
 
     compile "de.golfgl.gdxpushmessages:gdx-pushmessages-android-fcm:$pushMsgsVersion"
     
-    
-Note: Firebase Analytics is not included and Firebase Cloud Messanging's auto-init feature is disabled to respect the 
-privacy of your users.  
+
+
+| :information_source: Note | Firebase Analytics is not included and Firebase Cloud Messanging's auto-init feature is disabled to respect the privacy of your users. |
+| --- | --- |
+
+
     
 ### Instantiation
 
